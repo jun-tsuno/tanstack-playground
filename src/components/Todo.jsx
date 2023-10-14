@@ -1,6 +1,7 @@
 'use client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
+import StatusTable from './StatusTable';
 
 const fetchTodos = async () => {
 	const res = await fetch('http://localhost:3000/api/todos');
@@ -69,6 +70,27 @@ const Todo = () => {
 		},
 	});
 
+	// optimistic mutation
+	// const addMutation = useMutation(addTodo, {
+	// 	onMutate: async (name) => {
+	// 		await queryClient.cancelQueries(['todos']);
+
+	// 		const prevTodos = queryClient.getQueryData(['todos']);
+	// 		queryClient.setQueryData(['todos'], (old) => [
+	// 			...old,
+	// 			{ name, isCompleted: false },
+	// 		]);
+
+	// 		return { prevTodos };
+	// 	},
+	// 	onError: (err, todo, context) => {
+	// 		queryClient.setQueryData(['todos'], context.prevTodos);
+	// 	},
+	// 	onSettled: () => {
+	// 		queryClient.invalidateQueries('todos');
+	// 	},
+	// });
+
 	const deleteMutation = useMutation(deleteTodo, {
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ['todos'] });
@@ -85,6 +107,7 @@ const Todo = () => {
 		e.preventDefault();
 		if (!name) return alert('Field Required!!');
 		addMutation.mutate(name);
+		// addMutation.mutate(name);
 
 		return setName('');
 	};
@@ -122,9 +145,9 @@ const Todo = () => {
 				</button>
 			</form>
 
-			<ul className='mt-8 w-[300px] mx-auto'>
+			<ul className='mt-8 w-[500px] mx-auto'>
 				{todos?.map((todo, i) => (
-					<li key={todo.id}>
+					<li key={Math.random()}>
 						<input
 							type='checkbox'
 							checked={todo.isCompleted}
@@ -146,6 +169,8 @@ const Todo = () => {
 					</li>
 				))}
 			</ul>
+
+			<StatusTable />
 		</>
 	);
 };
